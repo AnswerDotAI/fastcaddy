@@ -15,16 +15,16 @@ $ pip install fastcaddy
 
 ## Installing Caddy
 
-``` python
-from fastcore.utils import *
-```
-
 This project is to help you use the caddy API, rather than a Caddyfile,
 to use caddy. To use the API, you need to install a plugin for your
 domain management service. We use Cloudflare, so we’ll document that
 here. For other domain services, see the Caddy docs for other plugins.
 
 ### Cloudflare setup
+
+``` python
+from fastcore.utils import *
+```
 
 You’ll need a token from Cloudflare with access to modify the necessary
 settings. Here’s the steps to create a token with the minimal
@@ -37,6 +37,11 @@ from cloudflare import Cloudflare
 
 Then you’ll need create a Cloudflare API token for your user, which
 we’ll then use to create the less privileged token.
+
+To create your user API token in Cloudflair, go to My Profile \> API
+Tokens. Create the token using the template “Create Additional Tokens.”
+This will pre-select the “User.API Tokens” Edit permission for you. Add
+the “Zone.Zone” Read permission, as well.
 
 ``` python
 cf_token = os.environ['CLOUDFLARE_API_TOKEN']
@@ -194,7 +199,7 @@ If all went well, you should see output like this:
 
 We will now show how to set up caddy as a reverse proxy for hosts added
 dynamically. We’ll grab our token from the previous step (assuming here
-that it’s stored in an env var:
+that it’s stored in an env var):
 
 ``` python
 cf_token = os.environ.get('CADDY_CF_TOKEN', 'XXX')
