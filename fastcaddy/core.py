@@ -114,6 +114,7 @@ def get_acme_config(token):
 # %% ../nbs/00_core.ipynb 29
 def add_acme_config(cf_token):
     if has_path(acme_path): return
+    pcfg({})
     init_path(acme_path)
     val = [get_acme_config(cf_token)]
     pcfg([{'issuers':val}], acme_path+'/policies')
@@ -136,17 +137,17 @@ def setup_caddy(cf_token, srv_name='srv0'):
     add_acme_config(cf_token)
     init_routes(srv_name)
 
-# %% ../nbs/00_core.ipynb 38
+# %% ../nbs/00_core.ipynb 39
 def add_route(route):
     "Add `route` dict to config"
     return pcfg(route, rts_path)
 
-# %% ../nbs/00_core.ipynb 39
+# %% ../nbs/00_core.ipynb 40
 def del_id(id):
     "Delete route for `id` (e.g. a host)"
     xdelete(get_id(id))
 
-# %% ../nbs/00_core.ipynb 41
+# %% ../nbs/00_core.ipynb 42
 def add_reverse_proxy(from_host, to_url):
     "Create a reverse proxy handler"
     if has_id(from_host): del_id(from_host)

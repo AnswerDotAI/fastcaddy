@@ -9,7 +9,7 @@ useradd --system \
     --comment "Caddy web server" \
     caddy
 
-cp ~/go/bin/caddy /usr/bin/
+cp "/home/$SUDO_USER/go/bin/caddy" /usr/bin/
 chmod a+x /usr/bin/caddy
 
 # Write caddy.service file
