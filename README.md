@@ -15,16 +15,16 @@ $ pip install fastcaddy
 
 ## Installing Caddy
 
-``` python
-from fastcore.utils import *
-```
-
 This project is to help you use the caddy API, rather than a Caddyfile,
 to use caddy. To use the API, you need to install a plugin for your
 domain management service. We use Cloudflare, so we’ll document that
 here. For other domain services, see the Caddy docs for other plugins.
 
 ### Cloudflare setup
+
+``` python
+from fastcore.utils import *
+```
 
 You’ll need a token from Cloudflare with access to modify the necessary
 settings. Here’s the steps to create a token with the minimal
@@ -140,16 +140,32 @@ go. So first install go:
 - Mac: `brew install go`
 - Linux: `sudo apt install golang`
 
+Note that if you are not on the latest Ubuntu, you’ll need to setup the
+backport repo before installing go:
+
+``` sh
+sudo add-apt-repository -y ppa:longsleep/golang-backports
+sudo apt update
+```
+
 Now we can install xcaddy:
 
 ``` sh
 go install github.com/caddyserver/xcaddy/cmd/xcaddy@latest
 ```
 
+Alternatively, you can download the latest xcaddy directly, e.g:
+
+``` sh
+# Change the OS and arch as needed, or remove them to view all options
+wget -qO- https://latest.fast.ai/latest/caddyserver/xcaddy/linux_amd64.tar.gz
+```
+
 Then we use that to compile caddy with our desired domain plugin
 (cloudflare, in this case):
 
 ``` sh
+mkdir -p ~/go/bin
 cd ~/go/bin
 ./xcaddy build --with github.com/caddy-dns/cloudflare
 ```
@@ -194,7 +210,7 @@ If all went well, you should see output like this:
 
 We will now show how to set up caddy as a reverse proxy for hosts added
 dynamically. We’ll grab our token from the previous step (assuming here
-that it’s stored in an env var:
+that it’s stored in an env var):
 
 ``` python
 cf_token = os.environ.get('CADDY_CF_TOKEN', 'XXX')
