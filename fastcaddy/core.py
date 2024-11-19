@@ -5,7 +5,8 @@
 # %% auto 0
 __all__ = ['acme_path', 'srvs_path', 'rts_path', 'get_id', 'get_path', 'gid', 'has_id', 'gcfg', 'has_path', 'pid', 'pcfg',
            'nested_setdict', 'path2keys', 'keys2path', 'nested_setcfg', 'init_path', 'get_acme_config',
-           'add_acme_config', 'init_routes', 'setup_caddy', 'add_route', 'del_id', 'add_reverse_proxy']
+           'add_acme_config', 'init_routes', 'setup_caddy', 'add_route', 'del_id', 'add_reverse_proxy',
+           'add_wildcard_route', 'add_sub_reverse_proxy']
 
 # %% ../nbs/00_core.ipynb 3
 import os, subprocess, httpx, json
@@ -161,3 +162,31 @@ def add_reverse_proxy(from_host, to_url):
         "terminal": True
     }
     add_route(route)
+
+# %% ../nbs/00_core.ipynb 46
+def add_wildcard_route(domain):
+    "Add a wildcard subdomain"
+    route = {
+        "match": [{"host": [f"*.{domain}"]}],
+        "handle": [
+            { "handler": "subroute", "routes": [] }
+        ],
+        "@id": f"wildcard-{domain}",
+        "terminal": True
+    }
+    add_route(route)
+
+# %% ../nbs/00_core.ipynb 48
+def add_sub_reverse_proxy(domain, subdomain, port):
+    "Add a reverse proxy to a wildcard subdomain"
+    wildcard_id = f"wildcard-{domain}"
+    route_id = f"{subdomain}.{domain}"
+    new_route = {
+        "@id": route_id,
+        "match": [{"host": [route_id]}],
+        "handle": [{
+            "handler": "reverse_proxy",
+            "upstreams": [{"dial": f"localhost:{port}"}]
+        }]
+    }
+    pid([new_route], f"{wildcard_id}/handle/0/routes/...")
