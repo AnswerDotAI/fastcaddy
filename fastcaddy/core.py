@@ -177,16 +177,18 @@ def add_wildcard_route(domain):
     add_route(route)
 
 # %% ../nbs/00_core.ipynb 48
-def add_sub_reverse_proxy(domain, subdomain, port, host='localhost'):
-    "Add a reverse proxy to a wildcard subdomain"
+def add_sub_reverse_proxy(domain, subdomain, ports, host='localhost'):
+    "Add a reverse proxy to a wildcard subdomain supporting multiple ports"
     wildcard_id = f"wildcard-{domain}"
     route_id = f"{subdomain}.{domain}"
+    if isinstance(ports, (int,str)): ports = [ports]
+    upstreams = [{"dial": f"{host}:{port}"} for port in ports]
     new_route = {
         "@id": route_id,
         "match": [{"host": [route_id]}],
         "handle": [{
             "handler": "reverse_proxy",
-            "upstreams": [{"dial": f"{host}:{port}"}]
+            "upstreams": upstreams
         }]
     }
     pid([new_route], f"{wildcard_id}/handle/0/routes/...")
