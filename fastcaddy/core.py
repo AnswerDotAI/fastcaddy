@@ -112,19 +112,28 @@ def get_acme_config(token):
         "challenges": { "dns": prov }
     }
 
-# %% ../nbs/00_core.ipynb 29
+# %% ../nbs/00_core.ipynb 30
 def add_acme_config(cf_token):
     if has_path(acme_path): return
     pcfg({})
     init_path(acme_path)
     val = [get_acme_config(cf_token)]
-    pcfg([{'issuers':val}], acme_path+'/policies')
+    
+    # Policies where we want to put the list of policies
+    acme_policy_path = acme_path+'/policies'
+    
+    if not gcfg(acme_policy_path): pcfg({'policies':[]}, acme_path)
+    # Get current list of policies, or if none empty list
+    current = gcfg(acme_policy_path)
+    
+    # Append current (existing list of policies or empty list) with val
+    pcfg(current + [{'issuers':val}], acme_policy_path, method='patch')
 
-# %% ../nbs/00_core.ipynb 33
+# %% ../nbs/00_core.ipynb 34
 srvs_path = '/apps/http/servers'
 rts_path = srvs_path+'/srv0/routes'
 
-# %% ../nbs/00_core.ipynb 34
+# %% ../nbs/00_core.ipynb 35
 def init_routes(srv_name='srv0'):
     "Create basic http server/routes config"
     if has_path(srvs_path): return
@@ -132,23 +141,23 @@ def init_routes(srv_name='srv0'):
     ir = {'listen': [':80', ':443'], 'routes': []}
     pcfg(ir, f"{srvs_path}/{srv_name}")
 
-# %% ../nbs/00_core.ipynb 36
+# %% ../nbs/00_core.ipynb 37
 def setup_caddy(cf_token, srv_name='srv0'):
     "Create SSL config and HTTP app skeleton"
     add_acme_config(cf_token)
     init_routes(srv_name)
 
-# %% ../nbs/00_core.ipynb 39
+# %% ../nbs/00_core.ipynb 40
 def add_route(route):
     "Add `route` dict to config"
     return pcfg(route, rts_path)
 
-# %% ../nbs/00_core.ipynb 40
+# %% ../nbs/00_core.ipynb 41
 def del_id(id):
     "Delete route for `id` (e.g. a host)"
     xdelete(get_id(id))
 
-# %% ../nbs/00_core.ipynb 42
+# %% ../nbs/00_core.ipynb 43
 def add_reverse_proxy(from_host, to_url):
     "Create a reverse proxy handler"
     if has_id(from_host): del_id(from_host)
@@ -163,7 +172,7 @@ def add_reverse_proxy(from_host, to_url):
     }
     add_route(route)
 
-# %% ../nbs/00_core.ipynb 46
+# %% ../nbs/00_core.ipynb 47
 def add_wildcard_route(domain):
     "Add a wildcard subdomain"
     route = {
@@ -176,7 +185,7 @@ def add_wildcard_route(domain):
     }
     add_route(route)
 
-# %% ../nbs/00_core.ipynb 48
+# %% ../nbs/00_core.ipynb 49
 def add_sub_reverse_proxy(domain, subdomain, port, host='localhost'):
     "Add a reverse proxy to a wildcard subdomain"
     wildcard_id = f"wildcard-{domain}"
