@@ -4,7 +4,7 @@
 
 # %% auto 0
 __all__ = ['automation_path', 'srvs_path', 'rts_path', 'get_id', 'get_path', 'gid', 'has_id', 'gcfg', 'has_path', 'pid', 'pcfg',
-           'nested_setdict', 'path2keys', 'keys2path', 'nested_setcfg', 'init_path', 'add_internal_config',
+           'nested_setdict', 'path2keys', 'keys2path', 'nested_setcfg', 'init_path', 'add_tls_internal_config',
            'get_acme_config', 'add_acme_config', 'init_routes', 'setup_caddy', 'add_route', 'del_id',
            'add_reverse_proxy', 'add_wildcard_route', 'add_sub_reverse_proxy']
 
@@ -107,10 +107,10 @@ def init_path(path, skip=0):
 automation_path = '/apps/tls/automation'
 
 # %% ../nbs/00_core.ipynb 29
-def add_internal_config():
-    if has_path(automation_path): return
+def add_tls_internal_config():
+    if has_path(automation_path): return    
     pcfg({})
-    init_path(policies_path)
+    init_path(automation_path)
     val = [{"issuers": [{"module": "internal"}],"subjects": ["localhost"]}]
     pcfg(val, automation_path+'/policies')
 
@@ -128,7 +128,7 @@ def add_acme_config(cf_token):
     pcfg({})
     init_path(automation_path)
     val = [get_acme_config(cf_token)]
-    pcfg([{'issuers':val}], acme_path+'/policies')
+    pcfg([{'issuers':val}], automation_path+'/policies')
 
 # %% ../nbs/00_core.ipynb 38
 srvs_path = '/apps/http/servers'
@@ -143,22 +143,26 @@ def init_routes(srv_name='srv0'):
     pcfg(ir, f"{srvs_path}/{srv_name}")
 
 # %% ../nbs/00_core.ipynb 41
-def setup_caddy(cf_token, srv_name='srv0'):
+def setup_caddy(
+        cf_token, # Cloudflare API token
+        srv_name='srv0', # Server name in the Caddyfile
+        local:bool=False): # Whether or not this is for localdev or deployment
     "Create SSL config and HTTP app skeleton"
-    add_acme_config(cf_token)
+    if local: add_tls_internal_config()
+    else: add_acme_config(cf_token)
     init_routes(srv_name)
 
-# %% ../nbs/00_core.ipynb 44
+# %% ../nbs/00_core.ipynb 45
 def add_route(route):
     "Add `route` dict to config"
     return pcfg(route, rts_path)
 
-# %% ../nbs/00_core.ipynb 45
+# %% ../nbs/00_core.ipynb 46
 def del_id(id):
     "Delete route for `id` (e.g. a host)"
     xdelete(get_id(id))
 
-# %% ../nbs/00_core.ipynb 47
+# %% ../nbs/00_core.ipynb 48
 def add_reverse_proxy(from_host, to_url):
     "Create a reverse proxy handler"
     if has_id(from_host): del_id(from_host)
@@ -173,7 +177,7 @@ def add_reverse_proxy(from_host, to_url):
     }
     add_route(route)
 
-# %% ../nbs/00_core.ipynb 51
+# %% ../nbs/00_core.ipynb 52
 def add_wildcard_route(domain):
     "Add a wildcard subdomain"
     route = {
@@ -186,7 +190,7 @@ def add_wildcard_route(domain):
     }
     add_route(route)
 
-# %% ../nbs/00_core.ipynb 53
+# %% ../nbs/00_core.ipynb 54
 def add_sub_reverse_proxy(domain, subdomain, port, host='localhost'):
     "Add a reverse proxy to a wildcard subdomain"
     wildcard_id = f"wildcard-{domain}"
