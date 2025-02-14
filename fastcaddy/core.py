@@ -111,7 +111,7 @@ def add_tls_internal_config():
     if has_path(automation_path): return    
     pcfg({})
     init_path(automation_path)
-    val = [{"issuers": [{"module": "internal"}],"subjects": ["localhost"]}]
+    val = [{"issuers": [{"module": "internal"}]}]
     pcfg(val, automation_path+'/policies')
 
 # %% ../nbs/00_core.ipynb 33
