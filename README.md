@@ -15,16 +15,16 @@ $ pip install fastcaddy
 
 ## Installing Caddy
 
+``` python
+from fastcore.utils import *
+```
+
 This project is to help you use the caddy API, rather than a Caddyfile,
 to use caddy. To use the API, you need to install a plugin for your
 domain management service. We use Cloudflare, so we’ll document that
 here. For other domain services, see the Caddy docs for other plugins.
 
 ### Cloudflare setup
-
-``` python
-from fastcore.utils import *
-```
 
 You’ll need a token from Cloudflare with access to modify the necessary
 settings. Here’s the steps to create a token with the minimal
@@ -177,6 +177,17 @@ This gives us a `~/go/bin/caddy` binary we can run:
 ./caddy run
 ```
 
+> [!TIP]
+>
+> ### How to make caddy available everywhere
+>
+> If you want the caddy command to be available everywhere, add this
+> line to your `.zshrc`:
+>
+> ``` bash
+> export PATH="$HOME/go/bin:$PATH"
+> ```
+
 ### Securely run caddy on start
 
 If you’re using a server or running caddy a lot, you’ll want it to run
@@ -209,12 +220,34 @@ If all went well, you should see output like this:
 ## How to use
 
 We will now show how to set up caddy as a reverse proxy for hosts added
-dynamically. We’ll grab our token from the previous step (assuming here
-that it’s stored in an env var):
+dynamically.
+
+### Initial setup
+
+We’ll grab our token from the previous step (assuming here that it’s
+stored in an env var):
 
 ``` python
-cf_token = os.environ.get('CADDY_CF_TOKEN', 'XXX')
+cf_token = os.environ.get('AAI_CF_TOKEN', 'XXX')
 ```
+
+------------------------------------------------------------------------
+
+<a
+href="https://github.com/AnswerDotAI/fastcaddy/blob/main/fastcaddy/core.py#LNone"
+target="_blank" style="float:right; font-size:smaller">source</a>
+
+#### setup_caddy
+
+>      setup_caddy (cf_token, srv_name='srv0', local:bool=False)
+
+*Create SSL config and HTTP app skeleton*
+
+|  | **Type** | **Default** | **Details** |
+|----|----|----|----|
+| cf_token |  |  | Cloudflare API token |
+| srv_name | str | srv0 | Server name in the Caddyfile |
+| local | bool | False | Whether or not this is for localdev or deployment |
 
 We can now setup the basic routes needed for caddy:
 
@@ -222,17 +255,23 @@ We can now setup the basic routes needed for caddy:
 setup_caddy(cf_token)
 ```
 
+------------------------------------------------------------------------
+
+<a
+href="https://github.com/AnswerDotAI/fastcaddy/blob/main/fastcaddy/core.py#LNone"
+target="_blank" style="float:right; font-size:smaller">source</a>
+
+#### gcfg
+
+>      gcfg (path='/', method='get')
+
+*Gets the config at `path`*
+
 To view the configuration created, use
 [`gcfg`](https://AnswerDotAI.github.io/fastcaddy/core.html#gcfg):
 
 ``` python
-gcfg()
-```
-
-``` json
-{ 'apps': { 'http': { 'servers': { 'srv0': { 'listen': [':80', ':443'],
-                                             'routes': []}}},
-            'tls': { 'automation': { 'policies': [{'issuers': [{'challenges': {'dns': {'provider': {'api_token': 'XXX', 'name': 'cloudflare'}}}, 'module': 'acme'}]}]}}}}
+# gcfg()
 ```
 
 You can also view a sub-path of the configuration:
@@ -245,6 +284,20 @@ gcfg('/apps/http/servers')
 {'srv0': {'listen': [':80', ':443'], 'routes': []}}
 ```
 
+### Reverse proxies
+
+------------------------------------------------------------------------
+
+<a
+href="https://github.com/AnswerDotAI/fastcaddy/blob/main/fastcaddy/core.py#LNone"
+target="_blank" style="float:right; font-size:smaller">source</a>
+
+#### add_reverse_proxy
+
+>      add_reverse_proxy (from_host, to_url)
+
+*Create a reverse proxy handler*
+
 To add a reverse proxy, use
 [`add_reverse_proxy`](https://AnswerDotAI.github.io/fastcaddy/core.html#add_reverse_proxy):
 
@@ -252,6 +305,18 @@ To add a reverse proxy, use
 host = 'jph.answer.ai'
 add_reverse_proxy(host, 'localhost:5001')
 ```
+
+------------------------------------------------------------------------
+
+<a
+href="https://github.com/AnswerDotAI/fastcaddy/blob/main/fastcaddy/core.py#LNone"
+target="_blank" style="float:right; font-size:smaller">source</a>
+
+#### gid
+
+>      gid (path='/')
+
+*Gets the id at `path`*
 
 This is automatically added with an id matching the host, which you can
 view with
@@ -279,8 +344,65 @@ gid('jph.answer.ai').handle[0]
 {'handler': 'reverse_proxy', 'upstreams': [{'dial': 'localhost:8000'}]}
 ```
 
+------------------------------------------------------------------------
+
+<a
+href="https://github.com/AnswerDotAI/fastcaddy/blob/main/fastcaddy/core.py#LNone"
+target="_blank" style="float:right; font-size:smaller">source</a>
+
+#### del_id
+
+>      del_id (id)
+
+*Delete route for `id` (e.g. a host)*
+
 To remove a host, delete its id:
 
 ``` python
 del_id(host)
+```
+
+### Wildcard subdomains
+
+Caddy can create a wildcard SSL cert. To do so, add a wildcard route:
+
+------------------------------------------------------------------------
+
+<a
+href="https://github.com/AnswerDotAI/fastcaddy/blob/main/fastcaddy/core.py#LNone"
+target="_blank" style="float:right; font-size:smaller">source</a>
+
+#### add_wildcard_route
+
+>      add_wildcard_route (domain)
+
+*Add a wildcard subdomain*
+
+``` python
+add_wildcard_route('something.fast.ai')
+```
+
+Create reverse proxies in a wildcard domain requires using a special
+function:
+
+------------------------------------------------------------------------
+
+<a
+href="https://github.com/AnswerDotAI/fastcaddy/blob/main/fastcaddy/core.py#LNone"
+target="_blank" style="float:right; font-size:smaller">source</a>
+
+#### add_sub_reverse_proxy
+
+>      add_sub_reverse_proxy (domain, subdomain, port, host='localhost')
+
+*Add a reverse proxy to a wildcard subdomain*
+
+``` python
+add_sub_reverse_proxy('something.fast.ai', 'foo', 5001)
+```
+
+These subdomains can be deleted in the usual way:
+
+``` python
+del_id('foo.something.fast.ai')
 ```
