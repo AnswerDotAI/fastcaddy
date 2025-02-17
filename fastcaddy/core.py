@@ -12,6 +12,7 @@ __all__ = ['acme_path', 'srvs_path', 'rts_path', 'get_id', 'get_path', 'gid', 'h
 import os, subprocess, httpx, json
 from fastcore.utils import *
 from httpx import HTTPStatusError, get as xget, post as xpost, patch as xpatch, put as xput, delete as xdelete, head as xhead
+from typing import Sequence
 
 # %% ../nbs/00_core.ipynb 5
 def get_id(path):
@@ -177,12 +178,17 @@ def add_wildcard_route(domain):
     add_route(route)
 
 # %% ../nbs/00_core.ipynb 48
-def add_sub_reverse_proxy(domain, subdomain, ports, host='localhost'):
+def add_sub_reverse_proxy(
+        domain,
+        subdomain,
+        port:str|int|Sequence[str|int], # A single port or list of ports
+        host='localhost'
+    ):
     "Add a reverse proxy to a wildcard subdomain supporting multiple ports"
     wildcard_id = f"wildcard-{domain}"
     route_id = f"{subdomain}.{domain}"
-    if isinstance(ports, (int,str)): ports = [ports]
-    upstreams = [{"dial": f"{host}:{port}"} for port in ports]
+    if isinstance(port, (int,str)): port = [port]
+    upstreams = [{"dial": f"{host}:{p}"} for p in port]
     new_route = {
         "@id": route_id,
         "match": [{"host": [route_id]}],
