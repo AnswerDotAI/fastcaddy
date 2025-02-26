@@ -24,6 +24,8 @@ jobs:
           sleep 5  # Give caddy time to start
 
       - name: Run nbdev tests
+        env:
+          CLOUDFLARE_API_TOKEN: DUMMY_TOKEN
         uses: fastai/workflows/nbdev-ci@master
 
       - name: Stop caddy
