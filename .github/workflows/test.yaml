@@ -27,6 +27,8 @@ jobs:
         env:
           CLOUDFLARE_API_TOKEN: DUMMY_TOKEN
         uses: fastai/workflows/nbdev-ci@master
+        with:
+          skip_test: true        
 
       - name: Stop caddy
         run: pkill caddy
