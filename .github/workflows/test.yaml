@@ -28,7 +28,7 @@ jobs:
           CLOUDFLARE_API_TOKEN: DUMMY_TOKEN
         uses: fastai/workflows/nbdev-ci@master
         with:
-          flags: "--skip_file_re 'index|test_"       
+          flags: "--skip_file_re \"index|test_\""       
 
       - name: Stop caddy
         run: pkill caddy
