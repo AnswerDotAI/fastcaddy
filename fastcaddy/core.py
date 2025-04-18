@@ -130,7 +130,7 @@ def init_routes(srv_name='srv0'):
     "Create basic http server/routes config"
     if has_path(srvs_path): return
     init_path(srvs_path, skip=1)
-    ir = {'listen': [':80', ':443'], 'routes': []}
+    ir = {'listen': [':80', ':443'], 'routes': [], 'protocols': ['h1', 'h2']}
     pcfg(ir, f"{srvs_path}/{srv_name}")
 
 # %% ../nbs/00_core.ipynb 36
