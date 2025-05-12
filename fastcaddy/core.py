@@ -70,6 +70,7 @@ def pcfg(d, path='/', method='post'):
     "Puts the config `d` into `path`"
     f = getattr(httpx, method)
     response = f(get_path(path), json=obj2dict(d))
+    if response.status_code != 200: print(response.status_code, response.text)
     response.raise_for_status()
     return response.text or None
 
