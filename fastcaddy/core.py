@@ -70,8 +70,10 @@ def pcfg(d, path='/', method='post'):
     "Puts the config `d` into `path`"
     f = getattr(httpx, method)
     response = f(get_path(path), json=obj2dict(d))
-    if response.status_code != 200: print(response.status_code, response.text)
-    response.raise_for_status()
+    try: response.raise_for_status()
+    except Exception as e:
+        e.add_note(f'{response.status_code=} {json.loads(response.text)}')
+        raise
     return response.text or None
 
 # %% ../nbs/00_core.ipynb 18
