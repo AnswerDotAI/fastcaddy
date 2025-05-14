@@ -72,7 +72,7 @@ def pcfg(d, path='/', method='post'):
     response = f(get_path(path), json=obj2dict(d))
     try: response.raise_for_status()
     except Exception as e:
-        e.add_note(f'{response.status_code=} {json.loads(response.text)}')
+        e.add_note(f"Error: '{json.loads(response.text)['error']}'")
         raise
     return response.text or None
 
