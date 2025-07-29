@@ -150,15 +150,15 @@ def del_id(id):
     xdelete(get_id(id))
 
 # %% ../nbs/00_core.ipynb 42
-def add_reverse_proxy(from_host, to_url):
+def add_reverse_proxy(from_host, to_url, match_xtra=None):
     "Create a reverse proxy handler"
-    if has_id(from_host): del_id(from_host)
+    if has_id(from_host): del_id(from_host)   
     route = {
         "handle": [{
             "handler": "reverse_proxy",
             "upstreams": [{"dial": to_url}]
         }],
-        "match": [{"host": [from_host]}],
+        "match": [{"host": [from_host]}] + (match_xtra or []),
         "@id": from_host,
         "terminal": True
     }
@@ -182,19 +182,19 @@ def add_sub_reverse_proxy(
         domain,
         subdomain,
         port:str|int|Sequence[str|int], # A single port or list of ports
-        host='localhost'
+        host='localhost',
+        match_xtra=None,
     ):
     "Add a reverse proxy to a wildcard subdomain supporting multiple ports"
     wildcard_id = f"wildcard-{domain}"
     route_id = f"{subdomain}.{domain}"
-    if isinstance(port, (int,str)): port = [port]
-    upstreams = [{"dial": f"{host}:{p}"} for p in port]
+    
     new_route = {
         "@id": route_id,
-        "match": [{"host": [route_id]}],
+        "match": [{"host": [from_host]}] + (match_xtra or []),
         "handle": [{
             "handler": "reverse_proxy",
-            "upstreams": upstreams
+            "upstreams": [{"dial": f"{host}:{p}"} for p in listify(port)]
         }]
     }
     pid([new_route], f"{wildcard_id}/handle/0/routes/...")
