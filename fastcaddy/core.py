@@ -191,7 +191,7 @@ def add_sub_reverse_proxy(
     
     new_route = {
         "@id": route_id,
-        "match": [{"host": [from_host]}] + (match_xtra or []),
+        "match": [{"host": [route_id]}] + (match_xtra or []),
         "handle": [{
             "handler": "reverse_proxy",
             "upstreams": [{"dial": f"{host}:{p}"} for p in listify(port)]
