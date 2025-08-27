@@ -5,8 +5,8 @@
 # %% auto 0
 __all__ = ['automation_path', 'srvs_path', 'rts_path', 'get_id', 'get_path', 'gid', 'has_id', 'gcfg', 'has_path', 'pid', 'pcfg',
            'nested_setdict', 'path2keys', 'keys2path', 'nested_setcfg', 'init_path', 'get_acme_config',
-           'add_tls_internal_config', 'add_acme_config', 'init_routes', 'setup_caddy', 'add_route', 'del_id',
-           'add_reverse_proxy', 'add_wildcard_route', 'add_sub_reverse_proxy']
+           'add_tls_internal_config', 'add_acme_config', 'init_routes', 'setup_pki_trust', 'setup_caddy', 'add_route',
+           'del_id', 'add_reverse_proxy', 'add_wildcard_route', 'add_sub_reverse_proxy']
 
 # %% ../nbs/00_core.ipynb 3
 import os, subprocess, httpx, json
@@ -142,28 +142,36 @@ def init_routes(srv_name='srv0', skip=1):
     pcfg(ir, f"{srvs_path}/{srv_name}")
 
 # %% ../nbs/00_core.ipynb 37
+def setup_pki_trust(install_trust):
+    "Configure PKI certificate authority trust installation"
+    if install_trust is None: return
+    pki_path = '/apps/pki/certificate_authorities/local'
+    init_path(pki_path, skip=1)
+    pcfg({"install_trust": install_trust}, pki_path)
+
+# %% ../nbs/00_core.ipynb 38
 def setup_caddy(
         cf_token=None, # Cloudflare API token
         srv_name='srv0', # Server name in the Caddyfile
         local:bool=False, # Whether or not this is for localdev or deployment
-        skip_install_trust:bool=None): # Skip installing trust store
+        install_trust:bool=None): # Install trust store?
     "Create SSL config and HTTP app skeleton"
-    if skip_install_trust is not None: pcfg(skip_install_trust, '/skip_install_trust', method='patch')
     if local: add_tls_internal_config()
     else: add_acme_config(cf_token)
+    setup_pki_trust(install_trust)
     init_routes(srv_name)
 
-# %% ../nbs/00_core.ipynb 40
+# %% ../nbs/00_core.ipynb 41
 def add_route(route):
     "Add `route` dict to config"
     return pcfg(route, rts_path)
 
-# %% ../nbs/00_core.ipynb 41
+# %% ../nbs/00_core.ipynb 42
 def del_id(id):
     "Delete route for `id` (e.g. a host)"
     xdelete(get_id(id))
 
-# %% ../nbs/00_core.ipynb 43
+# %% ../nbs/00_core.ipynb 44
 def add_reverse_proxy(from_host, to_url):
     "Create a reverse proxy handler"
     if has_id(from_host): del_id(from_host)
@@ -176,7 +184,7 @@ def add_reverse_proxy(from_host, to_url):
     }
     add_route(route)
 
-# %% ../nbs/00_core.ipynb 47
+# %% ../nbs/00_core.ipynb 48
 def add_wildcard_route(domain):
     "Add a wildcard subdomain"
     route = {
@@ -189,7 +197,7 @@ def add_wildcard_route(domain):
     }
     add_route(route)
 
-# %% ../nbs/00_core.ipynb 49
+# %% ../nbs/00_core.ipynb 50
 def add_sub_reverse_proxy(
         domain,
         subdomain,

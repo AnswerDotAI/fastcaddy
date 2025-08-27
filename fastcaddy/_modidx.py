@@ -27,4 +27,5 @@ d = { 'settings': { 'branch': 'main',
                                 'fastcaddy.core.path2keys': ('core.html#path2keys', 'fastcaddy/core.py'),
                                 'fastcaddy.core.pcfg': ('core.html#pcfg', 'fastcaddy/core.py'),
                                 'fastcaddy.core.pid': ('core.html#pid', 'fastcaddy/core.py'),
-                                'fastcaddy.core.setup_caddy': ('core.html#setup_caddy', 'fastcaddy/core.py')}}}
+                                'fastcaddy.core.setup_caddy': ('core.html#setup_caddy', 'fastcaddy/core.py'),
+                                'fastcaddy.core.setup_pki_trust': ('core.html#setup_pki_trust', 'fastcaddy/core.py')}}}
