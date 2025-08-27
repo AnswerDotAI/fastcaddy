@@ -145,8 +145,10 @@ def init_routes(srv_name='srv0', skip=1):
 def setup_caddy(
         cf_token=None, # Cloudflare API token
         srv_name='srv0', # Server name in the Caddyfile
-        local:bool=False): # Whether or not this is for localdev or deployment
+        local:bool=False, # Whether or not this is for localdev or deployment
+        skip_install_trust:bool=None): # Skip installing trust store
     "Create SSL config and HTTP app skeleton"
+    if skip_install_trust is not None: pcfg(skip_install_trust, '/skip_install_trust', method='patch')
     if local: add_tls_internal_config()
     else: add_acme_config(cf_token)
     init_routes(srv_name)
