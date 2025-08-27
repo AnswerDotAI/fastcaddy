@@ -2,6 +2,14 @@
 
 <!-- do not remove -->
 
+## 0.0.5
+
+### New Features
+
+- Multiport and internal tls support ([#9](https://github.com/AnswerDotAI/fastcaddy/issues/9)), thanks to [@pydanny](https://github.com/pydanny)
+- Improved pcfg error ([#8](https://github.com/AnswerDotAI/fastcaddy/pull/8)), thanks to [@pydanny](https://github.com/pydanny)
+
+
 ## 0.0.4
 
 ### New Features
