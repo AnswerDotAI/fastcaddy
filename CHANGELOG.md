@@ -2,6 +2,13 @@
 
 <!-- do not remove -->
 
+## 0.0.6
+
+### New Features
+
+- Add `skip_install_trust` ([#10](https://github.com/AnswerDotAI/fastcaddy/issues/10))
+
+
 ## 0.0.5
 
 ### New Features
