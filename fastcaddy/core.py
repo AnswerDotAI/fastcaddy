@@ -127,7 +127,7 @@ def add_acme_config(cf_token):
     pcfg({})
     init_path(automation_path)
     val = [get_acme_config(cf_token)]
-    pcfg([{'issuers':val}], acme_path+'/policies')
+    pcfg([{'issuers':val}], automation_path+'/policies')
 
 # %% ../nbs/00_core.ipynb 34
 srvs_path = '/apps/http/servers'
