@@ -2,6 +2,13 @@
 
 <!-- do not remove -->
 
+## 0.0.8
+
+### Bugs Squashed
+
+- update acme_path var name ([#11](https://github.com/AnswerDotAI/fastcaddy/pull/11)), thanks to [@RensDimmendaal](https://github.com/RensDimmendaal)
+
+
 ## 0.0.7
 
 ### New Features
