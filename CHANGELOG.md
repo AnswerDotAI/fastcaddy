@@ -2,6 +2,13 @@
 
 <!-- do not remove -->
 
+## 0.0.9
+
+### New Features
+
+- Add `encode` & `st_delay` args to reverse proxy functions ([#12](https://github.com/AnswerDotAI/fastcaddy/pull/12)), thanks to [@curtis-allan](https://github.com/curtis-allan)
+
+
 ## 0.0.8
 
 ### Bugs Squashed
