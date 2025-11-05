@@ -172,12 +172,19 @@ def del_id(id):
     xdelete(get_id(id))
 
 # %% ../nbs/00_core.ipynb 44
-def add_reverse_proxy(from_host, to_url):
+def add_reverse_proxy(from_host, to_url, st_delay='1m', encode:bool=True):
     "Create a reverse proxy handler"
     if has_id(from_host): del_id(from_host)
+    res = []
+    if encode: res.append({"handler": "encode", 
+                        "encodings": {"gzip":{}, "zstd":{}}, 
+                        "prefer": ["zstd", "gzip"]})
+    proxy = {"handler": "reverse_proxy", 
+        "upstreams": [{"dial": to_url}]}
+    if st_delay: proxy["stream_close_delay"] = st_delay
+    res.append(proxy)
     route = {
-        "handle": [{ "handler": "reverse_proxy",
-                    "upstreams": [{"dial": to_url}] }],
+        "handle": res,
         "match": [{"host": [from_host]}],
         "@id": from_host,
         "terminal": True
@@ -202,16 +209,25 @@ def add_sub_reverse_proxy(
         domain,
         subdomain,
         port:str|int|Sequence, # A single port or list of ports
-        host='localhost'
+        host='localhost',
+        st_delay='1m',
+        encode:bool=True
     ):
     "Add a reverse proxy to a wildcard subdomain supporting multiple ports"
     wildcard_id = f"wildcard-{domain}"
     route_id = f"{subdomain}.{domain}"
     if isinstance(port, (int,str)): port = [port]
     upstreams = [{"dial": f"{host}:{p}"} for p in port]
+    res = []
+    if encode: res.append({"handler": "encode", 
+            "encodings": {"gzip":{}, "zstd":{}}, 
+            "prefer": ["zstd", "gzip"]})
+    proxy = {"handler": "reverse_proxy", "upstreams": upstreams}
+    if st_delay: proxy["stream_close_delay"] = st_delay
+    res.append(proxy)
     new_route = {
         "@id": route_id,
         "match": [{"host": [route_id]}],
-        "handle": [{ "handler": "reverse_proxy", "upstreams": upstreams }]
+        "handle": res
     }
     pid([new_route], f"{wildcard_id}/handle/0/routes/...")
