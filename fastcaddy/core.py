@@ -105,7 +105,7 @@ def init_path(path, skip=0):
     for i,p in enumerate(path2keys(path)):
         sp.append(p)
         if i<skip: continue
-        pcfg({}, keys2path(*sp))
+        pcfg({}, keys2path(*sp), method='put')
 
 # %% ../nbs/00_core.ipynb 28
 automation_path = '/apps/tls/automation'
@@ -169,26 +169,20 @@ def add_route(route):
 # %% ../nbs/00_core.ipynb 42
 def del_id(id):
     "Delete route for `id` (e.g. a host)"
-    xdelete(get_id(id))
+    while has_id(id): xdelete(get_id(id))
 
 # %% ../nbs/00_core.ipynb 44
-def add_reverse_proxy(from_host, to_url, st_delay='1m', encode:bool=True):
+def add_reverse_proxy(from_host, to_url, st_delay='1m', compress:bool=True):
     "Create a reverse proxy handler"
     if has_id(from_host): del_id(from_host)
     res = []
-    if encode: res.append({"handler": "encode", 
-                        "encodings": {"gzip":{}, "zstd":{}}, 
-                        "prefer": ["zstd", "gzip"]})
-    proxy = {"handler": "reverse_proxy", 
-        "upstreams": [{"dial": to_url}]}
+    if compress:
+        enc = {"gzip":{"level": 1}, "zstd":{"level": "fastest"}}
+        res.append({"handler": "encode", "encodings": enc, "prefer": ["zstd", "gzip"]})
+    proxy = {"handler": "reverse_proxy", "upstreams": [{"dial": to_url}]}
     if st_delay: proxy["stream_close_delay"] = st_delay
     res.append(proxy)
-    route = {
-        "handle": res,
-        "match": [{"host": [from_host]}],
-        "@id": from_host,
-        "terminal": True
-    }
+    route = { "handle": res, "match": [{"host": [from_host]}], "@id": from_host, "terminal": True }
     add_route(route)
 
 # %% ../nbs/00_core.ipynb 48
