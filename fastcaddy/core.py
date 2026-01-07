@@ -5,8 +5,8 @@
 # %% auto 0
 __all__ = ['automation_path', 'srvs_path', 'rts_path', 'get_id', 'get_path', 'gid', 'has_id', 'gcfg', 'has_path', 'pid', 'pcfg',
            'nested_setdict', 'path2keys', 'keys2path', 'nested_setcfg', 'init_path', 'get_acme_config',
-           'add_tls_internal_config', 'add_acme_config', 'init_routes', 'setup_pki_trust', 'setup_caddy', 'add_route',
-           'del_id', 'add_reverse_proxy', 'add_wildcard_route', 'add_sub_reverse_proxy']
+           'add_tls_internal_config', 'add_acme_config', 'add_on_demand_tls', 'init_routes', 'setup_pki_trust',
+           'setup_caddy', 'add_route', 'del_id', 'add_reverse_proxy', 'add_wildcard_route', 'add_sub_reverse_proxy']
 
 # %% ../nbs/00_core.ipynb 3
 import os, subprocess, httpx, json
@@ -128,6 +128,20 @@ def add_acme_config(cf_token):
     init_path(automation_path)
     val = [get_acme_config(cf_token)]
     pcfg([{'issuers':val}], automation_path+'/policies')
+
+# %% ../nbs/00_core.ipynb 32
+def add_on_demand_tls(ask_url: str, interval: str = "5m", burst: int = 5):
+    "Configure on-demand TLS using an ask endpoint."
+    pcfg({})
+    for p in ('/apps', '/apps/tls', automation_path):
+        if not has_path(p): pcfg({}, p, method='put')
+    pcfg({"ask": ask_url, "interval": interval, "burst": burst}, automation_path+'/on_demand', method='put')
+    policies_path = automation_path+'/policies'
+    has_policies = has_path(policies_path)
+    policies = obj2dict(gcfg(policies_path)) if has_policies else []
+    if not any(isinstance(o, dict) and o.get('on_demand') and not o.get('subjects') for o in policies):
+        if has_policies: pcfg({"on_demand": True}, policies_path)
+        else: pcfg([{"on_demand": True}], policies_path, method='put')
 
 # %% ../nbs/00_core.ipynb 36
 srvs_path = '/apps/http/servers'
