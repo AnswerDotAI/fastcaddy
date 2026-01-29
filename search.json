@@ -1,0 +1,132 @@
+[
+  {
+    "objectID": "core.html",
+    "href": "core.html",
+    "title": "API",
+    "section": "",
+    "text": "source\n\n\n\ndef get_id(\n    path\n):\n\nGet a ID full URL from a path\n\nhost = 'jph.answer.ai'\n\n\nget_id('jph.answer.ai')\n\n'http://localhost:2019/id/jph.answer.ai/'\n\n\n\nsource\n\n\n\n\ndef get_path(\n    path\n):\n\nGet a config full URL from a path\n\nget_path('/apps/tls/automation/policies')\n\n'http://localhost:2019/config/apps/tls/automation/policies/'\n\n\n\nsource\n\n\n\n\ndef gid(\n    path:str='/'\n):\n\nGets the id at path\n\nsource\n\n\n\n\ndef has_id(\n    id\n):\n\nCheck if id is set up\n\nsource\n\n\n\n\ndef gcfg(\n    path:str='/', method:str='get'\n):\n\nGets the config at path\n\nsource\n\n\n\n\ndef has_path(\n    path\n):\n\nCheck if path is set up\n\ngcfg()\n\n\nsource\n\n\n\n\ndef pid(\n    d, path:str='/', method:str='post'\n):\n\nPuts the config d into path\n\nsource\n\n\n\n\ndef pcfg(\n    d, path:str='/', method:str='post'\n):\n\nPuts the config d into path\n\n# pcfg({})\n\n\nsource\n\n\n\n\ndef nested_setdict(\n    sd, value, keys:VAR_POSITIONAL\n):\n\nReturns sd updated to set value at the path keys\n\nnested_setdict({'a':'b'}, {'c':'d'}, 'apps', 'http', 'servers', 'srv0')\n\n{'a': 'b', 'apps': {'http': {'servers': {'srv0': {'c': 'd'}}}}}\n\n\n\nsource\n\n\n\n\ndef path2keys(\n    path\n):\n\nSplit path by ‘/’ into a list\n\npath2keys('/apps/tls/automation/policies')\n\n['apps', 'tls', 'automation', 'policies']\n\n\n\nsource\n\n\n\n\ndef keys2path(\n    keys:VAR_POSITIONAL\n):\n\nJoin keys into a ‘/’ separated path\n\nkeys2path('apps', 'tls', 'automation', 'policies')\n\n'/apps/tls/automation/policies'\n\n\n\nsource\n\n\n\n\ndef nested_setcfg(\n    value, keys:VAR_POSITIONAL\n):\n\n\nsource\n\n\n\n\ndef init_path(\n    path, skip:int=0\n):\n\n\n\n\n\n\ncf_token = os.environ.get('CADDY_CF_TOKEN', 'XXX')\n\n\nsource\n\n\n\ndef get_acme_config(\n    token\n):\n\n\nsource\n\n\n\n\ndef add_tls_internal_config(\n    \n):\n\n\nsource\n\n\n\n\ndef add_acme_config(\n    cf_token\n):\n\n\n# add_acme_config(cf_token)\n\n\n# gcfg('/apps/tls/automation/policies')[0]\n\n\n\n\n\n\nsource\n\n\n\ndef init_routes(\n    srv_name:str='srv0', skip:int=1\n):\n\nCreate basic http server/routes config\n\ninit_routes()\n\n\nsource\n\n\n\n\ndef setup_pki_trust(\n    install_trust\n):\n\nConfigure PKI certificate authority trust installation\n\nsource\n\n\n\n\ndef setup_caddy(\n    cf_token:NoneType=None, # Cloudflare API token\n    srv_name:str='srv0', # Server name in the Caddyfile\n    local:bool=False, # Whether or not this is for localdev or deployment\n    install_trust:bool=None, # Install trust store?\n):\n\nCreate SSL config and HTTP app skeleton\n\n# pcfg({})\nsetup_caddy(cf_token)\n\n\n# gcfg(srvs_path)\n\n\nsource\n\n\n\n\ndef add_route(\n    route\n):\n\nAdd route dict to config\n\nsource\n\n\n\n\ndef del_id(\n    id\n):\n\nDelete route for id (e.g. a host)\n\n# del_id(host)\n\n\nsource\n\n\n\n\ndef add_reverse_proxy(\n    from_host, to_url, st_delay:str='1m', compress:bool=True\n):\n\nCreate a reverse proxy handler\n\nhost = 'foo.fast.ai'\n\n\n# add_reverse_proxy(host, \"localhost:5001\")\n\n\n# gid(host)\n\n\nsource\n\n\n\n\ndef add_wildcard_route(\n    domain\n):\n\nAdd a wildcard subdomain\n\nadd_wildcard_route('something.fast.ai')\n\n\nsource\n\n\n\n\ndef add_sub_reverse_proxy(\n    domain, subdomain, port:Union, # A single port or list of ports\n    host:str='localhost', st_delay:str='1m', encode:bool=True\n):\n\nAdd a reverse proxy to a wildcard subdomain supporting multiple ports\n\nadd_sub_reverse_proxy('something.fast.ai', 'foo', 5001)\n\n\ndel_id('foo.something.fast.ai')",
+    "crumbs": [
+      "API"
+    ]
+  },
+  {
+    "objectID": "core.html#initial-functions",
+    "href": "core.html#initial-functions",
+    "title": "API",
+    "section": "",
+    "text": "source\n\n\n\ndef get_id(\n    path\n):\n\nGet a ID full URL from a path\n\nhost = 'jph.answer.ai'\n\n\nget_id('jph.answer.ai')\n\n'http://localhost:2019/id/jph.answer.ai/'\n\n\n\nsource\n\n\n\n\ndef get_path(\n    path\n):\n\nGet a config full URL from a path\n\nget_path('/apps/tls/automation/policies')\n\n'http://localhost:2019/config/apps/tls/automation/policies/'\n\n\n\nsource\n\n\n\n\ndef gid(\n    path:str='/'\n):\n\nGets the id at path\n\nsource\n\n\n\n\ndef has_id(\n    id\n):\n\nCheck if id is set up\n\nsource\n\n\n\n\ndef gcfg(\n    path:str='/', method:str='get'\n):\n\nGets the config at path\n\nsource\n\n\n\n\ndef has_path(\n    path\n):\n\nCheck if path is set up\n\ngcfg()\n\n\nsource\n\n\n\n\ndef pid(\n    d, path:str='/', method:str='post'\n):\n\nPuts the config d into path\n\nsource\n\n\n\n\ndef pcfg(\n    d, path:str='/', method:str='post'\n):\n\nPuts the config d into path\n\n# pcfg({})\n\n\nsource\n\n\n\n\ndef nested_setdict(\n    sd, value, keys:VAR_POSITIONAL\n):\n\nReturns sd updated to set value at the path keys\n\nnested_setdict({'a':'b'}, {'c':'d'}, 'apps', 'http', 'servers', 'srv0')\n\n{'a': 'b', 'apps': {'http': {'servers': {'srv0': {'c': 'd'}}}}}\n\n\n\nsource\n\n\n\n\ndef path2keys(\n    path\n):\n\nSplit path by ‘/’ into a list\n\npath2keys('/apps/tls/automation/policies')\n\n['apps', 'tls', 'automation', 'policies']\n\n\n\nsource\n\n\n\n\ndef keys2path(\n    keys:VAR_POSITIONAL\n):\n\nJoin keys into a ‘/’ separated path\n\nkeys2path('apps', 'tls', 'automation', 'policies')\n\n'/apps/tls/automation/policies'\n\n\n\nsource\n\n\n\n\ndef nested_setcfg(\n    value, keys:VAR_POSITIONAL\n):\n\n\nsource\n\n\n\n\ndef init_path(\n    path, skip:int=0\n):",
+    "crumbs": [
+      "API"
+    ]
+  },
+  {
+    "objectID": "core.html#automation-setup",
+    "href": "core.html#automation-setup",
+    "title": "API",
+    "section": "",
+    "text": "cf_token = os.environ.get('CADDY_CF_TOKEN', 'XXX')\n\n\nsource\n\n\n\ndef get_acme_config(\n    token\n):\n\n\nsource\n\n\n\n\ndef add_tls_internal_config(\n    \n):\n\n\nsource\n\n\n\n\ndef add_acme_config(\n    cf_token\n):\n\n\n# add_acme_config(cf_token)\n\n\n# gcfg('/apps/tls/automation/policies')[0]",
+    "crumbs": [
+      "API"
+    ]
+  },
+  {
+    "objectID": "core.html#route-setup",
+    "href": "core.html#route-setup",
+    "title": "API",
+    "section": "",
+    "text": "source\n\n\n\ndef init_routes(\n    srv_name:str='srv0', skip:int=1\n):\n\nCreate basic http server/routes config\n\ninit_routes()\n\n\nsource\n\n\n\n\ndef setup_pki_trust(\n    install_trust\n):\n\nConfigure PKI certificate authority trust installation\n\nsource\n\n\n\n\ndef setup_caddy(\n    cf_token:NoneType=None, # Cloudflare API token\n    srv_name:str='srv0', # Server name in the Caddyfile\n    local:bool=False, # Whether or not this is for localdev or deployment\n    install_trust:bool=None, # Install trust store?\n):\n\nCreate SSL config and HTTP app skeleton\n\n# pcfg({})\nsetup_caddy(cf_token)\n\n\n# gcfg(srvs_path)\n\n\nsource\n\n\n\n\ndef add_route(\n    route\n):\n\nAdd route dict to config\n\nsource\n\n\n\n\ndef del_id(\n    id\n):\n\nDelete route for id (e.g. a host)\n\n# del_id(host)\n\n\nsource\n\n\n\n\ndef add_reverse_proxy(\n    from_host, to_url, st_delay:str='1m', compress:bool=True\n):\n\nCreate a reverse proxy handler\n\nhost = 'foo.fast.ai'\n\n\n# add_reverse_proxy(host, \"localhost:5001\")\n\n\n# gid(host)\n\n\nsource\n\n\n\n\ndef add_wildcard_route(\n    domain\n):\n\nAdd a wildcard subdomain\n\nadd_wildcard_route('something.fast.ai')\n\n\nsource\n\n\n\n\ndef add_sub_reverse_proxy(\n    domain, subdomain, port:Union, # A single port or list of ports\n    host:str='localhost', st_delay:str='1m', encode:bool=True\n):\n\nAdd a reverse proxy to a wildcard subdomain supporting multiple ports\n\nadd_sub_reverse_proxy('something.fast.ai', 'foo', 5001)\n\n\ndel_id('foo.something.fast.ai')",
+    "crumbs": [
+      "API"
+    ]
+  },
+  {
+    "objectID": "test_add_sub_reverse_proxy.html",
+    "href": "test_add_sub_reverse_proxy.html",
+    "title": "Test add_sub_reverse_proxy",
+    "section": "",
+    "text": "from fastcaddy.core import *\nfrom fastcore.test import *\nimport json\ndef print_json(j): print(json.dumps(j))\npcfg({})\ncf_token = 'DUMMY_TOKEN'\nsetup_caddy(cf_token)\nAt this point our Caddy config is:\nprint(gcfg())\n\n{\n    'apps': {\n        'http': {'servers': {'srv0': {'listen': [':80', ':443'], 'routes': []}}},\n        'tls': {\n            'automation': {\n                'policies': [{'issuers': [{'challenges': {'dns': {'provider': {'api_token': 'DUMMY_TOKEN', 'name': \n'cloudflare'}}}, 'module': 'acme'}]}]\n            }\n        }\n    }\n}\nWe can confirm that by going to http://localhost:2019/config/",
+    "crumbs": [
+      "Test add_sub_reverse_proxy"
+    ]
+  },
+  {
+    "objectID": "test_add_sub_reverse_proxy.html#setup-add-wildcard-route-.something.example.com.",
+    "href": "test_add_sub_reverse_proxy.html#setup-add-wildcard-route-.something.example.com.",
+    "title": "Test add_sub_reverse_proxy",
+    "section": "Setup: add wildcard route *.something.example.com.",
+    "text": "Setup: add wildcard route *.something.example.com.\nThis is needed in order to add subroutes to it.\n\nadd_wildcard_route('something.example.com')\n\nNow our config should include the wildcard route:\n\nprint(gcfg())\n\n{\n    'apps': {\n        'http': {\n            'servers': {\n                'srv0': {\n                    'listen': [':80', ':443'],\n                    'routes': [{'@id': 'wildcard-something.example.com', 'handle': [{'handler': 'subroute', \n'routes': []}], 'match': [{'host': ['*.something.example.com']}], 'terminal': True}]\n                }\n            }\n        },\n        'tls': {\n            'automation': {\n                'policies': [{'issuers': [{'challenges': {'dns': {'provider': {'api_token': 'DUMMY_TOKEN', 'name': \n'cloudflare'}}}, 'module': 'acme'}]}]\n            }\n        }\n    }\n}\n\n\n\nAt this point there are no subroutes associated with that *.something.example.com wildcard. When that is matched, the handlers list is empty until…",
+    "crumbs": [
+      "Test add_sub_reverse_proxy"
+    ]
+  },
+  {
+    "objectID": "test_add_sub_reverse_proxy.html#add-subroute-1-foo.something.example.com",
+    "href": "test_add_sub_reverse_proxy.html#add-subroute-1-foo.something.example.com",
+    "title": "Test add_sub_reverse_proxy",
+    "section": "Add subroute 1: foo.something.example.com",
+    "text": "Add subroute 1: foo.something.example.com\n\nadd_sub_reverse_proxy('something.example.com', 'foo', 5001)\n\n\nprint(gcfg('/apps/http/servers/srv0/routes/0/handle'))\n\n[{'handler': 'subroute', 'routes': [{'@id': 'foo.something.example.com', 'handle': [{'handler': 'reverse_proxy', \n'upstreams': [{'dial': 'localhost:5001'}]}], 'match': [{'host': ['foo.something.example.com']}]}]}]\n\n\n\nNow we can see the handle config with the list of sub-routes and the sub-route handler.\n\nprint(gcfg('/apps/http/servers/srv0/routes/0/handle/0/routes'))\n\n[{'@id': 'foo.something.example.com', 'handle': [{'handler': 'reverse_proxy', 'upstreams': [{'dial': \n'localhost:5001'}]}], 'match': [{'host': ['foo.something.example.com']}]}]\n\n\n\nWe can see that:\n\nA route with id foo.something.example.com was created.\n\n\ntest_eq(gcfg('/apps/http/servers/srv0/routes/0/handle/0/routes/0/@id'), 'foo.something.example.com')\n\n\nIt matches requests for foo.something.example.com\n\n\ntest_eq(gcfg('apps/http/servers/srv0/routes/0/handle/0/routes/0/match/0/host/0'), 'foo.something.example.com')\n\n\nWhen a request for foo.something.example.com is matched, its handler is a reverse proxy to localhost:5001.\n\n\ntest_eq(gcfg('apps/http/servers/srv0/routes/0/handle/0/routes/0/handle/0/upstreams/0/dial'), 'localhost:5001')",
+    "crumbs": [
+      "Test add_sub_reverse_proxy"
+    ]
+  },
+  {
+    "objectID": "test_add_sub_reverse_proxy.html#add-subroute-2-bar.something.example.com",
+    "href": "test_add_sub_reverse_proxy.html#add-subroute-2-bar.something.example.com",
+    "title": "Test add_sub_reverse_proxy",
+    "section": "Add subroute 2: bar.something.example.com",
+    "text": "Add subroute 2: bar.something.example.com\n\nadd_sub_reverse_proxy('something.example.com', 'bar', 5002)\n\n\nprint(gcfg('/apps/http/servers/srv0/routes/0/handle'))\n\n[{'handler': 'subroute', 'routes': [{'@id': 'foo.something.example.com', 'handle': [{'handler': 'reverse_proxy', \n'upstreams': [{'dial': 'localhost:5001'}]}], 'match': [{'host': ['foo.something.example.com']}]}, {'@id': \n'bar.something.example.com', 'handle': [{'handler': 'reverse_proxy', 'upstreams': [{'dial': 'localhost:5002'}]}], \n'match': [{'host': ['bar.something.example.com']}]}]}]\n\n\n\nNow we see a single sub-route handler containing two routes.\n\nprint(gcfg('/apps/http/servers/srv0/routes/0/handle/0/routes'))\n\n[{'@id': 'foo.something.example.com', 'handle': [{'handler': 'reverse_proxy', 'upstreams': [{'dial': \n'localhost:5001'}]}], 'match': [{'host': ['foo.something.example.com']}]}, {'@id': 'bar.something.example.com', \n'handle': [{'handler': 'reverse_proxy', 'upstreams': [{'dial': 'localhost:5002'}]}], 'match': [{'host': \n['bar.something.example.com']}]}]\n\n\n\nHere we see that:\n\nThe foo.something.example.com subroute is still present.\n\n\ntest_eq(gcfg('/apps/http/servers/srv0/routes/0/handle/0/handler'), 'subroute')\n\n\nA route with id bar.something.example.com was created.\n\n\ntest_eq(gcfg('/apps/http/servers/srv0/routes/0/handle/0/routes/1/@id'), 'bar.something.example.com')\n\n\nIt matches requests for bar.something.example.com\n\n\ntest_eq(gcfg('/apps/http/servers/srv0/routes/0/handle/0/routes/1/match/0/host/0'),'bar.something.example.com')\n\n\nWhen a request for bar.something.example.com is matched, its handler is a reverse proxy to localhost:5002.\n\n\ntest_eq(gcfg('/apps/http/servers/srv0/routes/0/handle/0/routes/1/handle/0/upstreams/0/dial'), 'localhost:5002')",
+    "crumbs": [
+      "Test add_sub_reverse_proxy"
+    ]
+  },
+  {
+    "objectID": "test_add_sub_reverse_proxy.html#add-multi-port-subroute",
+    "href": "test_add_sub_reverse_proxy.html#add-multi-port-subroute",
+    "title": "Test add_sub_reverse_proxy",
+    "section": "Add multi-port subroute",
+    "text": "Add multi-port subroute\n\nadd_sub_reverse_proxy('something.example.com', 'multiport', [5003, 5004])\n\n\nprint(gcfg('/apps/http/servers/srv0/routes/0/handle/0/routes/2/handle/0/upstreams'))\n\n[{'dial': 'localhost:5003'}, {'dial': 'localhost:5004'}]\n\n\n\n\ntest_eq[{'dial': 'localhost:5003'}, {'dial': 'localhost:5004'}]",
+    "crumbs": [
+      "Test add_sub_reverse_proxy"
+    ]
+  },
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "fastcaddy",
+    "section": "",
+    "text": "Install from pypi\n$ pip install fastcaddy",
+    "crumbs": [
+      "fastcaddy"
+    ]
+  },
+  {
+    "objectID": "index.html#usage",
+    "href": "index.html#usage",
+    "title": "fastcaddy",
+    "section": "",
+    "text": "Install from pypi\n$ pip install fastcaddy",
+    "crumbs": [
+      "fastcaddy"
+    ]
+  },
+  {
+    "objectID": "index.html#installing-caddy",
+    "href": "index.html#installing-caddy",
+    "title": "fastcaddy",
+    "section": "Installing Caddy",
+    "text": "Installing Caddy\n\nfrom fastcore.utils import *\n\nThis project is to help you use the caddy API, rather than a Caddyfile, to use caddy. To use the API, you need to install a plugin for your domain management service. We use Cloudflare, so we’ll document that here. For other domain services, see the Caddy docs for other plugins.\n\nCloudflare setup\nYou’ll need a token from Cloudflare with access to modify the necessary settings. Here’s the steps to create a token with the minimal privileges. You’ll need to install the cloudflare pip package, then import:\n\nfrom cloudflare import Cloudflare\n\nThen you’ll need create a Cloudflare API token for your user, which we’ll then use to create the less privileged token.\n\ncf_token = os.environ['CLOUDFLARE_API_TOKEN']\n\nWe can now check that works OK:\n\ncf = Cloudflare(api_token=cf_token)\nzones = cf.zones.list()\nlen(zones.result)\n\n8\n\n\nReplace this with your domain name:\n\ndomain = 'answer.ai'\nzones = cf.zones.list(name=domain)\nassert len(zones.result)==1\n\n\nzone_id = zones.result[0].id\n\nHere’s the methods available for modifying DNS records:\n\nclient.dns.records.create(*, zone_id, **params) -&gt; Optional\nclient.dns.records.update(dns_record_id, *, zone_id, **params) -&gt; Optional\nclient.dns.records.list(*, zone_id, **params) -&gt; SyncV4PagePaginationArray[Record]\nclient.dns.records.delete(dns_record_id, *, zone_id) -&gt; Optional\nclient.dns.records.edit(dns_record_id, *, zone_id, **params) -&gt; Optional\nclient.dns.records.export(*, zone_id) -&gt; str\nclient.dns.records.get(dns_record_id, *, zone_id) -&gt; Optional\nclient.dns.records.import\\_(*, zone_id, **params) -&gt; Optional\nclient.dns.records.scan(*, zone_id, **params) -&gt; Optional\n\n…and here’s the methods for tokens:\nfrom cloudflare.types.user import (CIDRList, Policy, Token, TokenCreateResponse, TokenUpdateResponse, TokenListResponse,\n                                   TokenDeleteResponse, TokenGetResponse, TokenVerifyResponse)\n\nclient.user.tokens.create(**params) -&gt; Optional\nclient.user.tokens.update(token_id, **params) -&gt; object\nclient.user.tokens.list(**params) -&gt; SyncV4PagePaginationArray[object]\nclient.user.tokens.delete(token_id) -&gt; Optional\nclient.user.tokens.get(token_id) -&gt; object\nclient.user.tokens.verify() -&gt; Optional\n\nfrom cloudflare.types.user.tokens import PermissionGroupListResponse\n\nclient.user.tokens.permission_groups.list() -&gt; SyncSinglePage[object]\n\nfrom cloudflare.types.user.tokens import Value\n\nclient.user.tokens.value.update(token_id, **params) -&gt; str\n\nWe need these two permissions in our token:\n\npermission_groups = cf.user.tokens.permission_groups.list()\n\ndns_write = next(group for group in permission_groups if group['name'] == 'DNS Write')\nzone_read = next(group for group in permission_groups if group['name'] == 'Zone Read')\n\nNow we can create it:\nnew_token = cf.user.tokens.create(\n    name='caddy_dns',\n    policies=[{\n        \"effect\": \"allow\",\n        \"resources\": { f\"com.cloudflare.api.account.zone.{zone_id}\": \"*\" },\n        \"permission_groups\": [\n            {\"id\": zone_read['id'], \"name\": \"Zone Read\"},\n            {\"id\": dns_write['id'], \"name\": \"DNS Write\"}\n        ]\n    }]\n)\n\nprint(new_token.value)\nMake a copy of this value, which we’ll need for setting up caddy.\n\n\nInstalling caddy\nTo install caddy, we’ll use a tool called xcaddy. This is written in go. So first install go:\n\nMac: brew install go\nLinux: sudo apt install golang\n\nNote that if you are not on the latest Ubuntu, you’ll need to setup the backport repo before installing go:\nsudo add-apt-repository -y ppa:longsleep/golang-backports\nsudo apt update\nNow we can install xcaddy:\ngo install github.com/caddyserver/xcaddy/cmd/xcaddy@latest\nAlternatively, you can download the latest xcaddy directly, e.g:\n# Change the OS and arch as needed, or remove them to view all options\nwget -qO- https://latest.fast.ai/latest/caddyserver/xcaddy/linux_amd64.tar.gz\nThen we use that to compile caddy with our desired domain plugin (cloudflare, in this case):\nmkdir -p ~/go/bin\ncd ~/go/bin\n./xcaddy build --with github.com/caddy-dns/cloudflare\nThis gives us a ~/go/bin/caddy binary we can run:\n./caddy version\n./caddy run\n\n\nSecurely run caddy on start\nIf you’re using a server or running caddy a lot, you’ll want it to run on start. And if you’re making it publicly accessible, you’ll want it to be secure. This isn’t needed otherwise – you can just ~/go/bin/caddy run to run it manually (you may want to add ~/go/bin to your PATH env var).\nTo set this up, run from this repo root:\n./setup_service.sh\nIf all went well, you should see output like this:\n● caddy.service - Caddy\n     Loaded: loaded (/etc/systemd/system/caddy.service; enabled; preset: enabled)\n     Active: active (running) since Sat 2024-11-09 05:06:47 UTC; 2 days ago\n       Docs: https://caddyserver.com/docs/\n   Main PID: 138140 (caddy)\n      Tasks: 29 (limit: 154166)\n     Memory: 19.3M (peak: 28.8M)\n        CPU: 3min 37.216s\n     CGroup: /system.slice/caddy.service\n             └─138140 /usr/bin/caddy run --environ",
+    "crumbs": [
+      "fastcaddy"
+    ]
+  },
+  {
+    "objectID": "index.html#how-to-use",
+    "href": "index.html#how-to-use",
+    "title": "fastcaddy",
+    "section": "How to use",
+    "text": "How to use\nWe will now show how to set up caddy as a reverse proxy for hosts added dynamically.\n\nInitial setup\nWe’ll grab our token from the previous step (assuming here that it’s stored in an env var):\n\ncf_token = os.environ.get('AAI_CF_TOKEN', 'XXX')\n\n\nsource\n\nsetup_caddy\n\n setup_caddy (cf_token, srv_name='srv0')\n\nCreate SSL config and HTTP app skeleton\nWe can now setup the basic routes needed for caddy:\n\nsetup_caddy(cf_token)\n\n\nsource\n\n\ngcfg\n\n gcfg (path='/', method='get')\n\nGets the config at path\nTo view the configuration created, use gcfg:\n\n# gcfg()\n\nYou can also view a sub-path of the configuration:\n\ngcfg('/apps/http/servers')\n\n{'srv0': {'listen': [':80', ':443'], 'routes': []}}\n\n\n\n\n\nReverse proxies\n\nsource\n\nadd_reverse_proxy\n\n add_reverse_proxy (from_host, to_url)\n\nCreate a reverse proxy handler\nTo add a reverse proxy, use add_reverse_proxy:\n\nhost = 'jph.answer.ai'\nadd_reverse_proxy(host, 'localhost:5001')\n\n\nsource\n\n\ngid\n\n gid (path='/')\n\nGets the id at path\nThis is automatically added with an id matching the host, which you can view with gid:\n\ngid('jph.answer.ai')\n\n{ '@id': 'jph.answer.ai',\n  'handle': [{'handler': 'reverse_proxy', 'upstreams': [{'dial': 'localhost:5001'}]}],\n  'match': [{'host': ['jph.answer.ai']}],\n  'terminal': True}\n\n\nIf you call this again with the same host, it will be replaced:\n\nadd_reverse_proxy(host, 'localhost:8000')\ngid('jph.answer.ai').handle[0]\n\n{'handler': 'reverse_proxy', 'upstreams': [{'dial': 'localhost:8000'}]}\n\n\n\nsource\n\n\ndel_id\n\n del_id (id)\n\nDelete route for id (e.g. a host)\nTo remove a host, delete its id:\n\ndel_id(host)\n\n\n\n\nWildcard subdomains\nCaddy can create a wildcard SSL cert. To do so, add a wildcard route:\n\nsource\n\nadd_wildcard_route\n\n add_wildcard_route (domain)\n\nAdd a wildcard subdomain\n\nadd_wildcard_route('something.fast.ai')\n\nCreate reverse proxies in a wildcard domain requires using a special function:\n\nsource\n\n\nadd_sub_reverse_proxy\n\n add_sub_reverse_proxy (domain, subdomain, port)\n\nAdd a reverse proxy to a wildcard subdomain\n\nadd_sub_reverse_proxy('something.fast.ai', 'foo', 5001)\n\nThese subdomains can be deleted in the usual way:\n\ndel_id('foo.something.fast.ai')",
+    "crumbs": [
+      "fastcaddy"
+    ]
+  }
+]
