@@ -129,7 +129,7 @@ def add_acme_config(cf_token):
     val = [get_acme_config(cf_token)]
     pcfg([{'issuers':val}], automation_path+'/policies')
 
-# %% ../nbs/00_core.ipynb 32
+# %% ../nbs/00_core.ipynb #3ae8a4f8
 def add_on_demand_tls(ask_url: str, interval: str = "5m", burst: int = 5):
     "Configure on-demand TLS using an ask endpoint."
     pcfg({})
@@ -143,11 +143,6 @@ def add_on_demand_tls(ask_url: str, interval: str = "5m", burst: int = 5):
         if has_policies: pcfg({"on_demand": True}, policies_path)
         else: pcfg([{"on_demand": True}], policies_path, method='put')
 
-# %% ../nbs/00_core.ipynb 36
-srvs_path = '/apps/http/servers'
-rts_path = srvs_path+'/srv0/routes'
-
-# %% ../nbs/00_core.ipynb 37
 # %% ../nbs/00_core.ipynb #9f2a60df
 srvs_path = '/apps/http/servers'
 rts_path = srvs_path+'/srv0/routes'
@@ -160,7 +155,6 @@ def init_routes(srv_name='srv0', skip=1):
     ir = {'listen': [':80', ':443'], 'routes': [], 'protocols': ['h1', 'h2']}
     pcfg(ir, f"{srvs_path}/{srv_name}")
 
-# %% ../nbs/00_core.ipynb 39
 # %% ../nbs/00_core.ipynb #cce1f220
 def setup_pki_trust(install_trust):
     "Configure PKI certificate authority trust installation"
@@ -169,7 +163,6 @@ def setup_pki_trust(install_trust):
     init_path(pki_path, skip=1)
     pcfg({"install_trust": install_trust}, pki_path)
 
-# %% ../nbs/00_core.ipynb 40
 # %% ../nbs/00_core.ipynb #1d730861
 def setup_caddy(
         cf_token=None, # Cloudflare API token
@@ -182,19 +175,16 @@ def setup_caddy(
     setup_pki_trust(install_trust)
     init_routes(srv_name)
 
-# %% ../nbs/00_core.ipynb 43
 # %% ../nbs/00_core.ipynb #6e73c647
 def add_route(route):
     "Add `route` dict to config"
     return pcfg(route, rts_path)
 
-# %% ../nbs/00_core.ipynb 44
 # %% ../nbs/00_core.ipynb #edbda1de
 def del_id(id):
     "Delete route for `id` (e.g. a host)"
     while has_id(id): xdelete(get_id(id))
 
-# %% ../nbs/00_core.ipynb 46
 # %% ../nbs/00_core.ipynb #f3b95e5e
 def add_reverse_proxy(from_host, to_url, st_delay='1m', compress:bool=True):
     "Create a reverse proxy handler"
@@ -209,7 +199,6 @@ def add_reverse_proxy(from_host, to_url, st_delay='1m', compress:bool=True):
     route = { "handle": res, "match": [{"host": [from_host]}], "@id": from_host, "terminal": True }
     add_route(route)
 
-# %% ../nbs/00_core.ipynb 50
 # %% ../nbs/00_core.ipynb #d21091ad
 def add_wildcard_route(domain):
     "Add a wildcard subdomain"
@@ -223,7 +212,6 @@ def add_wildcard_route(domain):
     }
     add_route(route)
 
-# %% ../nbs/00_core.ipynb 52
 # %% ../nbs/00_core.ipynb #b30a11df
 def add_sub_reverse_proxy(
         domain,
