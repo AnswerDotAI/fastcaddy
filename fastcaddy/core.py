@@ -130,18 +130,11 @@ def add_acme_config(cf_token):
     pcfg([{'issuers':val}], automation_path+'/policies')
 
 # %% ../nbs/00_core.ipynb #3ae8a4f8
-def add_on_demand_tls(ask_url: str, interval: str = "5m", burst: int = 5):
-    "Configure on-demand TLS using an ask endpoint."
-    pcfg({})
-    for p in ('/apps', '/apps/tls', automation_path):
-        if not has_path(p): pcfg({}, p, method='put')
-    pcfg({"ask": ask_url, "interval": interval, "burst": burst}, automation_path+'/on_demand', method='put')
-    policies_path = automation_path+'/policies'
-    has_policies = has_path(policies_path)
-    policies = obj2dict(gcfg(policies_path)) if has_policies else []
-    if not any(isinstance(o, dict) and o.get('on_demand') and not o.get('subjects') for o in policies):
-        if has_policies: pcfg({"on_demand": True}, policies_path)
-        else: pcfg([{"on_demand": True}], policies_path, method='put')
+def add_on_demand_tls(endpoint: str):
+    "Configure on-demand TLS with a permission endpoint (Caddy 2.7+)."
+    pcfg({"module": "http", "endpoint": endpoint},
+         automation_path+'/on_demand/permission', method='put')
+    pcfg(True, automation_path+'/policies/0/on_demand', method='put')
 
 # %% ../nbs/00_core.ipynb #9f2a60df
 srvs_path = '/apps/http/servers'
