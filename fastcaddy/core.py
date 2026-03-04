@@ -5,8 +5,9 @@
 # %% auto #0
 __all__ = ['automation_path', 'srvs_path', 'rts_path', 'get_id', 'get_path', 'gid', 'has_id', 'gcfg', 'has_path', 'pid', 'pcfg',
            'nested_setdict', 'path2keys', 'keys2path', 'nested_setcfg', 'init_path', 'get_acme_config',
-           'add_tls_internal_config', 'add_acme_config', 'init_routes', 'setup_pki_trust', 'setup_caddy', 'add_route',
-           'del_id', 'add_reverse_proxy', 'add_wildcard_route', 'add_sub_reverse_proxy']
+           'add_tls_internal_config', 'add_acme_config', 'caddy_docs', 'get_schema', 'search_schema', 'init_routes',
+           'setup_pki_trust', 'setup_caddy', 'add_route', 'del_id', 'add_reverse_proxy', 'add_on_demand_tls',
+           'add_wildcard_route', 'add_sub_reverse_proxy']
 
 # %% ../nbs/00_core.ipynb #4efe69d2
 import os, subprocess, httpx, json
@@ -122,12 +123,49 @@ def add_tls_internal_config():
     pcfg(val, automation_path+'/policies')
 
 # %% ../nbs/00_core.ipynb #3d726b65
-def add_acme_config(cf_token):
+def add_acme_config(cf_token, subjects=None):
     if has_path(automation_path): return
     pcfg({})
     init_path(automation_path)
-    val = [get_acme_config(cf_token)]
-    pcfg([{'issuers':val}], automation_path+'/policies')
+    policy = {'issuers': [get_acme_config(cf_token)]}
+    if subjects: policy['subjects'] = subjects
+    pcfg([policy], automation_path+'/policies')
+
+# %% ../nbs/00_core.ipynb #d1459604
+_caddy_docs = None
+
+def caddy_docs():
+    global _caddy_docs
+    if not _caddy_docs:
+        pkg = Path(__file__).parent if '__file__' in globals() else Path('../fastcaddy')
+        _caddy_docs = loads((pkg/'caddy_schema.json').read_text())
+    return _caddy_docs
+
+# %% ../nbs/00_core.ipynb #10179442
+def get_schema(path:str):
+    "Get the caddy schema node at `path` (e.g. '/definitions/tls.automation.OnDemandConfig')"
+    node = caddy_docs()
+    for part in path.strip('/').split('/'):
+        node = node[int(part[1:-1])] if part.startswith('[') and part.endswith(']') else node[part]
+    return node
+
+# %% ../nbs/00_core.ipynb #686ae2fb
+def _search_schema(term, d, path='', max_results=20):
+    results = []
+    if isinstance(d, dict):
+        for k, v in d.items():
+            p = f"{path}/{k}"
+            if term.lower() in k.lower(): results.append(('key', p))
+            results.extend(_search_schema(term, v, p, max_results))
+    elif isinstance(d, list):
+        for i, v in enumerate(d): results.extend(_search_schema(term, v, f"{path}[{i}]", max_results))
+    elif isinstance(d, str) and term.lower() in d.lower(): results.append(('value', path, d[:200]))
+    return results[:max_results]
+
+def search_schema(term:str, path:str='', max_results:int=20):
+    "Recursively search caddy schema `caddy_docs` for keys/values containing `term`"
+    d = get_schema(path) if path else caddy_docs()
+    return _search_schema(term, d, path, max_results)
 
 # %% ../nbs/00_core.ipynb #9f2a60df
 srvs_path = '/apps/http/servers'
@@ -154,10 +192,12 @@ def setup_caddy(
         cf_token=None, # Cloudflare API token
         srv_name='srv0', # Server name in the Caddyfile
         local:bool=False, # Whether or not this is for localdev or deployment
-        install_trust:bool=None): # Install trust store?
+        install_trust:bool=None,  # Install trust store?
+        subjects=None # Subject names to restrict ACME cert issuance to
+    ):
     "Create SSL config and HTTP app skeleton"
     if local: add_tls_internal_config()
-    else: add_acme_config(cf_token)
+    else: add_acme_config(cf_token, subjects=subjects)
     setup_pki_trust(install_trust)
     init_routes(srv_name)
 
@@ -185,14 +225,27 @@ def add_reverse_proxy(from_host, to_url, st_delay='1m', compress:bool=True):
     route = { "handle": res, "match": [{"host": [from_host]}], "@id": from_host, "terminal": True }
     add_route(route)
 
+# %% ../nbs/00_core.ipynb #78f094d5
+def add_on_demand_tls(endpoint):
+    for p in ('/apps', '/apps/tls', automation_path):
+        if not has_path(p): pcfg({}, p, method='put')
+    od = {"permission": {"module": "http", "endpoint": endpoint}}
+    pcfg(od, automation_path+'/on_demand', method='put')
+    policies_path = automation_path+'/policies'
+    od_policy = {"on_demand": True, "issuers": [{"module": "acme"}]}
+    if not has_path(policies_path): pcfg([od_policy], policies_path, method='put')
+    else:
+        policies = obj2dict(gcfg(policies_path))
+        if not any(isinstance(o, dict) and o.get('on_demand') for o in policies):
+            policies.append(od_policy)
+            pcfg(policies, policies_path, method='patch')
+
 # %% ../nbs/00_core.ipynb #d21091ad
 def add_wildcard_route(domain):
     "Add a wildcard subdomain"
     route = {
         "match": [{"host": [f"*.{domain}"]}],
-        "handle": [
-            { "handler": "subroute", "routes": [] }
-        ],
+        "handle": [ { "handler": "subroute", "routes": [] } ],
         "@id": f"wildcard-{domain}",
         "terminal": True
     }

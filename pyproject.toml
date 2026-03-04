@@ -24,6 +24,9 @@ fastcaddy = "fastcaddy._modidx:d"
 [tool.setuptools.dynamic]
 version = {attr = "fastcaddy.__version__"}
 
+[tool.setuptools.package-data]
+fastcaddy = ["caddy_schema.json"]
+
 [tool.setuptools.packages.find]
 include = ["fastcaddy"]
 
