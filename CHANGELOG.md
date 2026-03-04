@@ -2,6 +2,13 @@
 
 <!-- do not remove -->
 
+## 0.0.10
+
+### New Features
+
+- Add on-demand TLS, schema search helpers, and subject filtering for ACME config ([#14](https://github.com/AnswerDotAI/fastcaddy/issues/14))
+
+
 ## 0.0.9
 
 ### New Features
@@ -13,7 +20,7 @@
 
 ### Bugs Squashed
 
-- update acme_path var name ([#11](https://github.com/AnswerDotAI/fastcaddy/pull/11)), thanks to [@RensDimmendaal](https://github.com/RensDimmendaal)
+- update `acme_path` var name ([#11](https://github.com/AnswerDotAI/fastcaddy/pull/11)), thanks to [@RensDimmendaal](https://github.com/RensDimmendaal)
 
 
 ## 0.0.7
