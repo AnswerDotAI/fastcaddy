@@ -15,28 +15,21 @@ $ pip install fastcaddy
 
 ## Installing Caddy
 
-This project is to help you use the caddy API, rather than a Caddyfile,
-to use caddy. To use the API, you need to install a plugin for your
-domain management service. We use Cloudflare, so we’ll document that
-here. For other domain services, see the Caddy docs for other plugins.
-
-### Cloudflare setup
-
 ``` python
 from fastcore.utils import *
 ```
 
-You’ll need a token from Cloudflare with access to modify the necessary
-settings. Here’s the steps to create a token with the minimal
-privileges. You’ll need to install the cloudflare pip package, then
-import:
+This project is to help you use the caddy API, rather than a Caddyfile, to use caddy. To use the API, you need to install a plugin for your domain management service. We use Cloudflare, so we’ll document that here. For other domain services, see the Caddy docs for other plugins.
+
+### Cloudflare setup
+
+You’ll need a token from Cloudflare with access to modify the necessary settings. Here’s the steps to create a token with the minimal privileges. You’ll need to install the cloudflare pip package, then import:
 
 ``` python
 from cloudflare import Cloudflare
 ```
 
-Then you’ll need create a Cloudflare API token for your user, which
-we’ll then use to create the less privileged token.
+Then you’ll need create a Cloudflare API token for your user, which we’ll then use to create the less privileged token.
 
 ``` python
 cf_token = os.environ['CLOUDFLARE_API_TOKEN']
@@ -94,8 +87,7 @@ from cloudflare.types.user import (CIDRList, Policy, Token, TokenCreateResponse,
 from cloudflare.types.user.tokens import PermissionGroupListResponse
 ```
 
-- client.user.tokens.permission_groups.list() -\>
-  SyncSinglePage\[object\]
+- client.user.tokens.permission_groups.list() -\> SyncSinglePage\[object\]
 
 ``` python
 from cloudflare.types.user.tokens import Value
@@ -134,14 +126,12 @@ Make a copy of this value, which we’ll need for setting up caddy.
 
 ### Installing caddy
 
-To install caddy, we’ll use a tool called `xcaddy`. This is written in
-go. So first install go:
+To install caddy, we’ll use a tool called `xcaddy`. This is written in go. So first install go:
 
 - Mac: `brew install go`
 - Linux: `sudo apt install golang`
 
-Note that if you are not on the latest Ubuntu, you’ll need to setup the
-backport repo before installing go:
+Note that if you are not on the latest Ubuntu, you’ll need to setup the backport repo before installing go:
 
 ``` sh
 sudo add-apt-repository -y ppa:longsleep/golang-backports
@@ -161,8 +151,7 @@ Alternatively, you can download the latest xcaddy directly, e.g:
 wget -qO- https://latest.fast.ai/latest/caddyserver/xcaddy/linux_amd64.tar.gz
 ```
 
-Then we use that to compile caddy with our desired domain plugin
-(cloudflare, in this case):
+Then we use that to compile caddy with our desired domain plugin (cloudflare, in this case):
 
 ``` sh
 mkdir -p ~/go/bin
@@ -179,11 +168,7 @@ This gives us a `~/go/bin/caddy` binary we can run:
 
 ### Securely run caddy on start
 
-If you’re using a server or running caddy a lot, you’ll want it to run
-on start. And if you’re making it publicly accessible, you’ll want it to
-be secure. This isn’t needed otherwise – you can just
-`~/go/bin/caddy run` to run it manually (you may want to add `~/go/bin`
-to your `PATH` env var).
+If you’re using a server or running caddy a lot, you’ll want it to run on start. And if you’re making it publicly accessible, you’ll want it to be secure. This isn’t needed otherwise – you can just `~/go/bin/caddy run` to run it manually (you may want to add `~/go/bin` to your `PATH` env var).
 
 To set this up, run from this repo root:
 
@@ -208,13 +193,25 @@ If all went well, you should see output like this:
 
 ## How to use
 
-We will now show how to set up caddy as a reverse proxy for hosts added
-dynamically. We’ll grab our token from the previous step (assuming here
-that it’s stored in an env var):
+We will now show how to set up caddy as a reverse proxy for hosts added dynamically.
+
+### Initial setup
+
+We’ll grab our token from the previous step (assuming here that it’s stored in an env var):
 
 ``` python
-cf_token = os.environ.get('CADDY_CF_TOKEN', 'XXX')
+cf_token = os.environ.get('AAI_CF_TOKEN', 'XXX')
 ```
+
+------------------------------------------------------------------------
+
+<a href="https://github.com/AnswerDotAI/fastcaddy/blob/main/fastcaddy/core.py#LNone" target="_blank" style="float:right; font-size:smaller">source</a>
+
+#### setup_caddy
+
+>  setup_caddy (cf_token, srv_name='srv0')
+
+*Create SSL config and HTTP app skeleton*
 
 We can now setup the basic routes needed for caddy:
 
@@ -222,17 +219,20 @@ We can now setup the basic routes needed for caddy:
 setup_caddy(cf_token)
 ```
 
-To view the configuration created, use
-[`gcfg`](https://AnswerDotAI.github.io/fastcaddy/core.html#gcfg):
+------------------------------------------------------------------------
+
+<a href="https://github.com/AnswerDotAI/fastcaddy/blob/main/fastcaddy/core.py#LNone" target="_blank" style="float:right; font-size:smaller">source</a>
+
+#### gcfg
+
+>  gcfg (path='/', method='get')
+
+*Gets the config at `path`*
+
+To view the configuration created, use [`gcfg`](https://AnswerDotAI.github.io/fastcaddy/core.html#gcfg):
 
 ``` python
-gcfg()
-```
-
-``` json
-{ 'apps': { 'http': { 'servers': { 'srv0': { 'listen': [':80', ':443'],
-                                             'routes': []}}},
-            'tls': { 'automation': { 'policies': [{'issuers': [{'challenges': {'dns': {'provider': {'api_token': 'XXX', 'name': 'cloudflare'}}}, 'module': 'acme'}]}]}}}}
+# gcfg()
 ```
 
 You can also view a sub-path of the configuration:
@@ -245,17 +245,36 @@ gcfg('/apps/http/servers')
 {'srv0': {'listen': [':80', ':443'], 'routes': []}}
 ```
 
-To add a reverse proxy, use
-[`add_reverse_proxy`](https://AnswerDotAI.github.io/fastcaddy/core.html#add_reverse_proxy):
+### Reverse proxies
+
+------------------------------------------------------------------------
+
+<a href="https://github.com/AnswerDotAI/fastcaddy/blob/main/fastcaddy/core.py#LNone" target="_blank" style="float:right; font-size:smaller">source</a>
+
+#### add_reverse_proxy
+
+>  add_reverse_proxy (from_host, to_url)
+
+*Create a reverse proxy handler*
+
+To add a reverse proxy, use [`add_reverse_proxy`](https://AnswerDotAI.github.io/fastcaddy/core.html#add_reverse_proxy):
 
 ``` python
 host = 'jph.answer.ai'
 add_reverse_proxy(host, 'localhost:5001')
 ```
 
-This is automatically added with an id matching the host, which you can
-view with
-[`gid`](https://AnswerDotAI.github.io/fastcaddy/core.html#gid):
+------------------------------------------------------------------------
+
+<a href="https://github.com/AnswerDotAI/fastcaddy/blob/main/fastcaddy/core.py#LNone" target="_blank" style="float:right; font-size:smaller">source</a>
+
+#### gid
+
+>  gid (path='/')
+
+*Gets the id at `path`*
+
+This is automatically added with an id matching the host, which you can view with [`gid`](https://AnswerDotAI.github.io/fastcaddy/core.html#gid):
 
 ``` python
 gid('jph.answer.ai')
@@ -279,8 +298,58 @@ gid('jph.answer.ai').handle[0]
 {'handler': 'reverse_proxy', 'upstreams': [{'dial': 'localhost:8000'}]}
 ```
 
+------------------------------------------------------------------------
+
+<a href="https://github.com/AnswerDotAI/fastcaddy/blob/main/fastcaddy/core.py#LNone" target="_blank" style="float:right; font-size:smaller">source</a>
+
+#### del_id
+
+>  del_id (id)
+
+*Delete route for `id` (e.g. a host)*
+
 To remove a host, delete its id:
 
 ``` python
 del_id(host)
+```
+
+### Wildcard subdomains
+
+Caddy can create a wildcard SSL cert. To do so, add a wildcard route:
+
+------------------------------------------------------------------------
+
+<a href="https://github.com/AnswerDotAI/fastcaddy/blob/main/fastcaddy/core.py#LNone" target="_blank" style="float:right; font-size:smaller">source</a>
+
+#### add_wildcard_route
+
+>  add_wildcard_route (domain)
+
+*Add a wildcard subdomain*
+
+``` python
+add_wildcard_route('something.fast.ai')
+```
+
+Create reverse proxies in a wildcard domain requires using a special function:
+
+------------------------------------------------------------------------
+
+<a href="https://github.com/AnswerDotAI/fastcaddy/blob/main/fastcaddy/core.py#LNone" target="_blank" style="float:right; font-size:smaller">source</a>
+
+#### add_sub_reverse_proxy
+
+>  add_sub_reverse_proxy (domain, subdomain, port)
+
+*Add a reverse proxy to a wildcard subdomain*
+
+``` python
+add_sub_reverse_proxy('something.fast.ai', 'foo', 5001)
+```
+
+These subdomains can be deleted in the usual way:
+
+``` python
+del_id('foo.something.fast.ai')
 ```
