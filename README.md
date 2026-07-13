@@ -195,6 +195,8 @@ If all went well, you should see output like this:
 
 We will now show how to set up caddy as a reverse proxy for hosts added dynamically.
 
+fastcaddy talks to caddy’s admin API, and config set that way is *ephemeral*: it doesn’t survive a caddy restart. So the recommended pattern is a setup script that runs on every deploy (e.g. from systemd): call [`reset()`](https://AnswerDotAI.github.io/fastcaddy/core.html#reset), then the functions below for everything you host. Each function is safe to re-run – routes are tagged with predictable `@id`s (the hostname, or `wildcard-{domain}`), and re-adding one replaces it rather than duplicating it – so the script is the single source of truth for your routing config.
+
 ### Initial setup
 
 We’ll grab our token from the previous step (assuming here that it’s stored in an env var):
@@ -291,7 +293,7 @@ If you call this again with the same host, it will be replaced:
 
 ``` python
 add_reverse_proxy(host, 'localhost:8000')
-gid('jph.answer.ai').handle[0]
+gid('jph.answer.ai').handle[1]
 ```
 
 ``` json
@@ -316,7 +318,7 @@ del_id(host)
 
 ### Wildcard subdomains
 
-Caddy can create a wildcard SSL cert. To do so, add a wildcard route:
+Caddy can create a wildcard SSL cert. To do so, add a wildcard route (a no-op if it already exists, so existing subdomains inside it are never destroyed):
 
 ------------------------------------------------------------------------
 

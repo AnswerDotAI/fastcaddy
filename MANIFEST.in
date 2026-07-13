@@ -1,5 +1,4 @@
-include settings.ini
 include LICENSE
-include CONTRIBUTING.md
+include fastcaddy/caddy_schema.json
 include README.md
 recursive-exclude * __pycache__
