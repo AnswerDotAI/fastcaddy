@@ -2,6 +2,12 @@
 
 <!-- do not remove -->
 
+## 0.0.11
+
+### New Features
+
+- Redesign API as a documented two-layer contract with recipes that are safe to re-run ([#15](https://github.com/AnswerDotAI/fastcaddy/issues/15))
+
 ## 0.0.10
 
 ### New Features
