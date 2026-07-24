@@ -36,69 +36,93 @@ class CaddyAdmin:
         if self._client is None: self._client = httpx.Client()
         return self._client
 
-    def get_id(self, path):
-        "Get an ID full URL from a path"
-        if path[0]!='/': path = '/'+path
-        if path[-1]!='/': path = path+'/'
-        return f'{self.url}/id{path}'
+# %% ../nbs/00_core.ipynb #caddyadmininst
+default_admin = CaddyAdmin()
 
-    def get_path(self, path):
-        "Get a config full URL from a path"
-        if path[0]!='/': path = '/'+path
-        if path[-1]!='/': path = path+'/'
-        return f'{self.url}/config{path}'
+# %% ../nbs/00_core.ipynb #p_getid
+@patch
+def get_id(self:CaddyAdmin, path):
+    "Get an ID full URL from a path"
+    if path[0]!='/': path = '/'+path
+    if path[-1]!='/': path = path+'/'
+    return f'{self.url}/id{path}'
 
-    def _req(self, method, url, **kw):
-        "Request `url` via `method`, raising errors enriched with caddy's detail; returns the response"
-        try: response = self.client.request(method, url, **kw)
-        except ConnectError as e:
-            e.add_note(f"Could not reach the caddy admin API at {self.url} -- is caddy running?")
-            raise
-        try: response.raise_for_status()
-        except HTTPStatusError as e:
-            try: msg = json.loads(response.text)['error']
-            except Exception: msg = response.text
-            if msg: e.add_note(f"Error: '{msg}'")
-            raise
-        return response
+# %% ../nbs/00_core.ipynb #p_getpath
+@patch
+def get_path(self:CaddyAdmin, path):
+    "Get a config full URL from a path"
+    if path[0]!='/': path = '/'+path
+    if path[-1]!='/': path = path+'/'
+    return f'{self.url}/config{path}'
 
-    def gid(self, path='/'):
-        "Get the config object whose `@id` matches `path`"
-        return dict2obj(self._req('GET', self.get_id(path)).json())
+# %% ../nbs/00_core.ipynb #p_req
+@patch
+def _req(self:CaddyAdmin, method, url, **kw):
+    "Request `url` via `method`, raising errors enriched with caddy's detail; returns the response"
+    try: response = self.client.request(method, url, **kw)
+    except ConnectError as e:
+        e.add_note(f"Could not reach the caddy admin API at {self.url} -- is caddy running?")
+        raise
+    try: response.raise_for_status()
+    except HTTPStatusError as e:
+        try: msg = json.loads(response.text)['error']
+        except Exception: msg = response.text
+        if msg: e.add_note(f"Error: '{msg}'")
+        raise
+    return response
 
-    def has_id(self, id):
-        "Check if `id` is set up"
-        try: self.gid(id)
-        except HTTPStatusError: return False
-        return True
+# %% ../nbs/00_core.ipynb #p_gid
+@patch
+def gid(self:CaddyAdmin, path='/'):
+    "Get the config object whose `@id` matches `path`"
+    return dict2obj(self._req('GET', self.get_id(path)).json())
 
-    def gcfg(self, path='/'):
-        "Get the config at `path`"
-        return dict2obj(self._req('GET', self.get_path(path)).json())
+# %% ../nbs/00_core.ipynb #p_hasid
+@patch
+def has_id(self:CaddyAdmin, id):
+    "Check if `id` is set up"
+    try: self.gid(id)
+    except HTTPStatusError: return False
+    return True
 
-    def has_path(self, path):
-        "Check if any config exists at `path`"
-        try: return self.gcfg(path) is not None
-        except HTTPStatusError: return False
+# %% ../nbs/00_core.ipynb #p_gcfg
+@patch
+def gcfg(self:CaddyAdmin, path='/'):
+    "Get the config at `path`"
+    return dict2obj(self._req('GET', self.get_path(path)).json())
 
-    def pid(self, d, path='/', method='POST'):
-        "Put/post config `d` to the object whose `@id` matches `path`"
-        return self._req(method, self.get_id(path), json=obj2dict(d)).text or None
+# %% ../nbs/00_core.ipynb #p_haspath
+@patch
+def has_path(self:CaddyAdmin, path):
+    "Check if any config exists at `path`"
+    try: return self.gcfg(path) is not None
+    except HTTPStatusError: return False
 
-    def pcfg(self, d, path='/', method='POST'):
-        "Put/post config `d` at `path`"
-        return self._req(method, self.get_path(path), json=obj2dict(d)).text or None
+# %% ../nbs/00_core.ipynb #p_pid
+@patch
+def pid(self:CaddyAdmin, d, path='/', method='POST'):
+    "Put/post config `d` to the object whose `@id` matches `path`"
+    return self._req(method, self.get_id(path), json=obj2dict(d)).text or None
 
-    def reset(self):
-        "Erase the entire caddy config"
-        return self.pcfg({})
+# %% ../nbs/00_core.ipynb #p_pcfg
+@patch
+def pcfg(self:CaddyAdmin, d, path='/', method='POST'):
+    "Put/post config `d` at `path`"
+    return self._req(method, self.get_path(path), json=obj2dict(d)).text or None
 
-    def del_id(self, id):
-        "Delete every config object whose `@id` matches `id` (e.g. a host)"
-        while self.has_id(id): self._req('DELETE', self.get_id(id))
+# %% ../nbs/00_core.ipynb #p_reset
+@patch
+def reset(self:CaddyAdmin):
+    "Erase the entire caddy config"
+    return self.pcfg({})
+
+# %% ../nbs/00_core.ipynb #p_delid
+@patch
+def del_id(self:CaddyAdmin, id):
+    "Delete every config object whose `@id` matches `id` (e.g. a host)"
+    while self.has_id(id): self._req('DELETE', self.get_id(id))
 
 # %% ../nbs/00_core.ipynb #caddyadminbind
-default_admin = CaddyAdmin()
 get_id,get_path,gid,has_id,gcfg,has_path,pid,pcfg,reset,del_id = (
     default_admin.get_id, default_admin.get_path, default_admin.gid, default_admin.has_id,
     default_admin.gcfg, default_admin.has_path, default_admin.pid, default_admin.pcfg,
