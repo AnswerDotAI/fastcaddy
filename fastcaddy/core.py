@@ -1,4 +1,4 @@
-"""Wrap the Caddy admin API: low-level config primitives, plus opinionated recipes for TLS and reverse-proxy routes
+"""Configure Caddy through its admin API, with helpers for TLS and reverse-proxy routes
 
 Docs: https://AnswerDotAI.github.io/fastcaddy/core.html.md"""
 
