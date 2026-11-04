@@ -220,11 +220,13 @@ def encode_handler():
 # %% ../nbs/00_core.ipynb #d1a22749
 def proxy_handler(
     *upstreams, # Upstream dial addresses, e.g. 'localhost:5001'
-    st_delay='1m' # Keep streaming connections open this long across config reloads (None to disable)
+    st_delay='1m', # Keep streaming connections open this long across config reloads (None to disable)
+    header=None # Header whose value pins requests to one upstream
 ):
     "A `reverse_proxy` handler dialing `upstreams`"
     res = {"handler": "reverse_proxy", "upstreams": [{"dial": u} for u in upstreams]}
     if st_delay: res["stream_close_delay"] = st_delay
+    if header: res['load_balancing'] = {'selection_policy': {'policy':'header', 'field':header}}
     return res
 
 # %% ../nbs/00_core.ipynb #6e73c647
@@ -238,12 +240,12 @@ def del_id(id):
     while has_id(id): _req(xdelete, get_id(id))
 
 # %% ../nbs/00_core.ipynb #f3b95e5e
-def add_reverse_proxy(from_host, to_url, st_delay='1m', encode:bool=True):
+def add_reverse_proxy(from_host, to_url, st_delay='1m', encode:bool=True, header=None):
     "Create (or replace) a route reverse-proxying `from_host` to `to_url`, tagged with `@id` `from_host`"
     if has_id(from_host): del_id(from_host)
     res = []
     if encode: res.append(encode_handler())
-    res.append(proxy_handler(to_url, st_delay=st_delay))
+    res.append(proxy_handler(*listify(to_url), st_delay=st_delay, header=header))
     add_route({ "handle": res, "match": [{"host": [from_host]}], "@id": from_host, "terminal": True })
 
 # %% ../nbs/00_core.ipynb #78f094d5
