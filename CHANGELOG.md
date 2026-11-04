@@ -2,6 +2,13 @@
 
 <!-- do not remove -->
 
+## 0.0.12
+
+### New Features
+
+- Add header-based sticky load balancing to `proxy_handler` and `add_reverse_proxy`, and accept multiple upstreams in `to_url` ([#17](https://github.com/AnswerDotAI/fastcaddy/issues/17))
+
+
 ## 0.0.11
 
 ### New Features
@@ -62,6 +69,3 @@
 ## 0.0.2
 
 - Initial release
-
-
-
